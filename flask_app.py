@@ -1,48 +1,56 @@
-import sqlalchemy
+
+# dependencies
+
+from flask import Flask, render_template, jsonify
+from sqlalchemy import create_engine
 from sqlalchemy.ext.automap import automap_base
-
-from sqlalchemy import (
-    create_engine,
-    MetaData,
-    Table,
-    inspect,
-    Column,
-    String,
-    Integer)
-
-from sqlalchemy.orm import (
-    Session,
-    mapper,
-    scoped_session,
-    sessionmaker)
+from sqlalchemy.orm import Session
+from flask_sqlalchemy import SQLAlchemy
+import pandas as pd
 
 
-#import pandas as pd
+db_url = "sqlite:///belly_button_biodiversity.sqlite"
 
-#from flask import Flask, jsonify,render_template
-# reflect an existing database into a new model
-Base = automap_base()    
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+db = SQLAlchemy(app)
 
-engine = create_engine("sqlite:///belly_button_biodiversity.sqlite")
-metadata = MetaData(engine)
-print("engine created.........")
+@app.route("/")
+def home_page():
+    return render_template('index.html')
 
-# reflect the tables
-Base.prepare(engine, reflect=True)
+@app.route("/sampleNames")
+def get_sample_names():
 
-samples = Base.classes.samples
-#otu = Base.classes.otu
 
-print("Tables reflected....")
+    # create engine that connects us to the database
+    engine = create_engine(db_url, echo='debug')
 
-# Create our session (link) from Python to the DB
-session = Session(engine)
+    # use automap_base so that we don't have to define classes for our tables
+    Base = automap_base()
 
-inspector = inspect(engine)
-inspector.get_table_names()
+    Base.prepare(engine, reflect=True)
 
-# Create an app, being sure to pass __name__
-#app = Flask(__name__)
+    #extract the samples_metadata which has the sample names
+    samples_metadata = Base.classes.samples_metadata
+
+    #create a session
+    session = Session(engine)
+
+    #retrieve the sample names
+    sample_names = [str(x) for x in session.query(samples_metadata.SAMPLEID).all()]
+
+    return jsonify(sample_names)
+
+@app.route("/otu")
+def get_otu():
+
+
+
+
+
+    
+
 
 
 
