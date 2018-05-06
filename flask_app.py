@@ -1,6 +1,8 @@
 
 # dependencies
 from flask import Flask, render_template, jsonify, request, redirect
+from sqlalchemy import MetaData
+from sqlalchemy.ext.automap import automap_base
 
 from flask_sqlalchemy import SQLAlchemy
 import pandas as pd
@@ -9,13 +11,17 @@ app = Flask(__name__)
 
 db_url = "sqlite:///belly_button_biodiversity.sqlite"
 
-app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', '') or db_url
 db = SQLAlchemy(app)
 
-class otu(db.Model):
-    __tablename__ = 'metadata'
+metadata = MetaData()
+tables = ['otu', 'samples', 'samples_metadata']
+metadata.reflect(db.engine, only=tables)
+Base = automap_base(metadata=metadata)
+Base.prepare(engine, reflect=True)
 
-    SAMPLEID = db.column(db.Integer, primary_keys=True)
+from .models import otu, samples_metadata 
+
 
 
 # Create database tables
@@ -32,73 +38,105 @@ def home_page():
 @app.route("/sampleNames")
 def get_sample_names():
 
-    # create engine that connects us to the database
-    engine = create_engine(db_url, echo='debug')
-
-    # use automap_base so that we don't have to define classes for our tables
-    Base = automap_base()
-
-    Base.prepare(engine, reflect=True)
-
-    #extract the samples_metadata which has the sample names
-    samples_metadata = Base.classes.samples_metadata
-
-    #create a session
-    session = Session(engine)
-
     #retrieve the sample names
-    sample_names = [str(x) for x in session.query(samples_metadata.SAMPLEID).all()]
+    sample_names = [str(x) for x in db.session.query(metadata.SAMPLEID).all()]
 
     return jsonify(sample_names)
 
 
 @app.route("/otu")
 def get_otu():
-    # create engine that connects us to the database
-    engine = create_engine(db_url, echo='debug')
+    """List of OTU descriptions.
 
-    # use automap_base so that we don't have to define classes for our tables
-    Base = automap_base()
+    Returns a list of OTU descriptions in the following format
 
-    Base.prepare(engine, reflect=True)
+    [
+        "Archaea;Euryarchaeota;Halobacteria;Halobacteriales;Halobacteriaceae;Halococcus",
+        "Archaea;Euryarchaeota;Halobacteria;Halobacteriales;Halobacteriaceae;Halococcus",
+        "Bacteria",
+        "Bacteria",
+        "Bacteria",
+        ...
+    ]
+    """
 
-    #extract the otu which has the sample names
-    otu = Base.classes.otu
-
-    #create a session
-    session = Session(engine)
-
-    #retrieve the sample names
-    unit_names = [str(x) for x in session.query(otu.taxonomic_unit).all()]
+    unit_names = [str(x) for x in db.session.query(otu.taxonomic_unit).all()]
 
     return jsonify(unit_names)
 
 
 @app.route("/metadata/<sample>")
 def get_sample_meta(sample):
-        # create engine that connects us to the database
-    engine = create_engine(db_url, echo='debug')
+    """MetaData for a given sample.
 
-    # use automap_base so that we don't have to define classes for our tables
-    Base = automap_base()
+    Args: Sample in the format: `BB_940`
 
-    Base.prepare(engine, reflect=True)
+    Returns a json dictionary of sample metadata in the format
 
-    #extract the samples_metadata which has the sample names
-    samples_metadata = Base.classes.samples_metadata
-
-    #create a session
-    session = Session(engine)
-
-    final_json = session.query(samples_metadata.AGE,
+    {
+        AGE: 24,
+        BBTYPE: "I",
+        ETHNICITY: "Caucasian",
+        GENDER: "F",
+        LOCATION: "Beaufort/NC",
+        SAMPLEID: 940
+    }
+    """
+    result = db.session.query(samples_metadata.AGE,
                                samples_metadata.BBTYPE,
                                samples_metadata.ETHNICITY,
                                samples_metadata.GENDER,
                                samples_metadata.LOCATION,
                                samples_metadata.SAMPLEID
                                ).filter(samples_metadata.SAMPLEID == sample)
-    print(final_json)
-    return jsonify(final_json)
+    print(result)
+    return jsonify(result)
+
+@app.route('/wfreq/<sample>')
+def get_wfreq(sample):
+    """Weekly Washing Frequency as a number.
+
+    Args: Sample in the format: `BB_940`
+
+    Returns an integer value for the weekly washing frequency `WFREQ`
+    """
+    result = db.session.query(samples_metadata.WFREQ).filter(samples_metadata.SAMPLEID == sample)
+    print(result)
+    return jsonify(result)
+
+@app.route('/samples/<sample>')
+def get_samples(sample)
+    """OTU IDs and Sample Values for a given sample.
+
+    Sort your Pandas DataFrame (OTU ID and Sample Value)
+    in Descending Order by Sample Value
+
+    Return a list of dictionaries containing sorted lists  for `otu_ids`
+    and `sample_values`
+
+    [
+        {
+            otu_ids: [
+                1166,
+                2858,
+                481,
+                ...
+            ],
+            sample_values: [
+                163,
+                126,
+                113,
+                ...
+            ]
+        }
+    ]
+    """
+    from sqlalchemy import create_engine
+    engine = create_engine(db_url)
+    # empty list for samples 
+    otu_samples = []
+
+    for row in session.query()
 
 if __name__ == "__main__":
     app.run(debug=True)
