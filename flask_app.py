@@ -1,9 +1,7 @@
 
 # dependencies
-from flask import Flask, render_template, jsonify
-from sqlalchemy import create_engine, inspect
-from sqlalchemy.ext.automap import automap_base
-from sqlalchemy.orm import Session
+from flask import Flask, render_template, jsonify, request, redirect
+
 from flask_sqlalchemy import SQLAlchemy
 import pandas as pd
 
@@ -15,7 +13,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 db = SQLAlchemy(app)
 
 class otu(db.Model):
-    __tablename__ = 
+    __tablename__ = 'metadata'
+
+    SAMPLEID = db.column(db.Integer, primary_keys=True)
+
 
 # Create database tables
 @app.before_first_request
