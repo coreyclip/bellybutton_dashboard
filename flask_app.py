@@ -4,23 +4,24 @@ from flask import Flask, render_template, jsonify, request, redirect
 from sqlalchemy import MetaData
 from sqlalchemy.ext.automap import automap_base
 
+
 from flask_sqlalchemy import SQLAlchemy
 import pandas as pd
 
 app = Flask(__name__)
 
-db_url = "sqlite:///belly_button_biodiversity.sqlite"
+db_url = "sqlite:///db/belly_button_biodiversity.sqlite"
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', '') or db_url
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 db = SQLAlchemy(app)
 
 metadata = MetaData()
 tables = ['otu', 'samples', 'samples_metadata']
 metadata.reflect(db.engine, only=tables)
 Base = automap_base(metadata=metadata)
-Base.prepare(engine, reflect=True)
+Base.prepare(db.engine, reflect=True)
 
-from .models import otu, samples_metadata 
+#from .models import otu, samples_metadata 
 
 
 
@@ -61,7 +62,7 @@ def get_otu():
     """
 
     unit_names = [str(x) for x in db.session.query(otu.taxonomic_unit).all()]
-
+    print(unit_names)
     return jsonify(unit_names)
 
 
@@ -105,7 +106,7 @@ def get_wfreq(sample):
     return jsonify(result)
 
 @app.route('/samples/<sample>')
-def get_samples(sample)
+def get_samples(sample):
     """OTU IDs and Sample Values for a given sample.
 
     Sort your Pandas DataFrame (OTU ID and Sample Value)
@@ -131,12 +132,15 @@ def get_samples(sample)
         }
     ]
     """
-    from sqlalchemy import create_engine
-    engine = create_engine(db_url)
-    # empty list for samples 
+ 
     otu_samples = []
+    samples = Base.classes.samples
 
-    for row in session.query()
+    for row in session.query(samples).all():
+        otu_samples.append(row)
+    print(otu_samples)
+
+    return jsonify(otu_samples)
 
 if __name__ == "__main__":
     app.run(debug=True)
