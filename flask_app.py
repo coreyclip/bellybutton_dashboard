@@ -1,28 +1,28 @@
 
 # dependencies
+import os
 from flask import Flask, render_template, jsonify, request, redirect
-from sqlalchemy import MetaData
-from sqlalchemy.ext.automap import automap_base
-
-
 from flask_sqlalchemy import SQLAlchemy
+from flask_marshmallow import Marshmallow
+
 import pandas as pd
 
 app = Flask(__name__)
 
 db_url = "sqlite:///db/belly_button_biodiversity.sqlite"
 
-app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False 
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL", '') or db_url
 db = SQLAlchemy(app)
 
-metadata = MetaData()
-tables = ['otu', 'samples', 'samples_metadata']
-metadata.reflect(db.engine, only=tables)
-Base = automap_base(metadata=metadata)
-Base.prepare(db.engine, reflect=True)
+from models import Otu, samples_metadata 
 
-#from .models import otu, samples_metadata 
+#marshmallow automatically creates shemas
+ma = Marshmallow(app)
 
+class OtuSchema(ma.ModelSchema):
+    class Meta:
+        model = otu
 
 
 # Create database tables
@@ -32,9 +32,19 @@ def setup():
     # db.drop_all()
     db.create_all()
 
+@app.route("/data")
+def data():
+    results = session.query.all()
+    df = pd.DataFrame(results)
+    return jsonify(df.to_dict(orient='records'))
+
 @app.route("/")
 def home_page():
-    return render_template('index.html')
+    one_otu = otu.query.first()
+    otu_schema = OtuSchema()
+    output = otu_schema.dump(one_otu).data
+    return jsonify(output) 
+    #return render_template('index.html')
 
 @app.route("/sampleNames")
 def get_sample_names():
