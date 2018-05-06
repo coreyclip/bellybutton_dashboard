@@ -3,7 +3,7 @@
 import os
 from flask import Flask, render_template, jsonify, request, redirect
 from flask_sqlalchemy import SQLAlchemy
-from flask_marshmallow import Marshmallow
+
 
 import pandas as pd
 
@@ -16,13 +16,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL", '') or db
 db = SQLAlchemy(app)
 
 from models import Otu, samples_metadata 
-
-#marshmallow automatically creates shemas
-ma = Marshmallow(app)
-
-class OtuSchema(ma.ModelSchema):
-    class Meta:
-        model = otu
 
 
 # Create database tables
@@ -40,18 +33,15 @@ def data():
 
 @app.route("/")
 def home_page():
-    one_otu = otu.query.first()
-    otu_schema = OtuSchema()
-    output = otu_schema.dump(one_otu).data
-    return jsonify(output) 
-    #return render_template('index.html')
+
+    return render_template('index.html')
 
 @app.route("/sampleNames")
 def get_sample_names():
 
     #retrieve the sample names
-    sample_names = [str(x) for x in db.session.query(metadata.SAMPLEID).all()]
-
+    sample_names = ["BB_" + str(x).strip("(").rstrip(",)") for x in db.session.query(samples_metadata.SAMPLEID).all()]
+    print(sample_names)
     return jsonify(sample_names)
 
 
