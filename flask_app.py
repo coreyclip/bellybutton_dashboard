@@ -22,7 +22,7 @@ class Otu(db.Model):
     __tablename__ = 'otu'
 
     otu_id = db.Column(db.Integer, primary_key=True)
-    lowest_taxanomic_unit_found = db.Column(db.String)
+    lowest_taxonomic_unit_found = db.Column(db.String)
     
     def __repr__(self):
         return '<id %r>' % (self.otu_id)
@@ -64,6 +64,9 @@ def setup():
 
 @app.route("/data")
 def data():
+    '''
+    for debuging purposes
+    '''
     results = session.query.all()
     df = pd.DataFrame(results)
     return jsonify(df.to_dict(orient='records'))
@@ -98,7 +101,7 @@ def get_otu():
     ]
     """
 
-    unit_names = [str(x) for x in db.session.query(otu.taxonomic_unit).all()]
+    unit_names = [str(x).strip("(").rstrip(",)") for x in db.session.query(Otu.lowest_taxonomic_unit_found).all()]
     print(unit_names)
     return jsonify(unit_names)
 
@@ -120,13 +123,16 @@ def get_sample_meta(sample):
         SAMPLEID: 940
     }
     """
+    query = int(sample.strip("BB_"))
+    print(query, " data type: ", type(query))
     result = db.session.query(samples_metadata.AGE,
                                samples_metadata.BBTYPE,
                                samples_metadata.ETHNICITY,
                                samples_metadata.GENDER,
                                samples_metadata.LOCATION,
                                samples_metadata.SAMPLEID
-                               ).filter(samples_metadata.SAMPLEID == sample)
+                               ).filter(samples_metadata.SAMPLEID == query).all()
+    
     print(result)
     return jsonify(result)
 
