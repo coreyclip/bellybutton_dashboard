@@ -8,15 +8,13 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Belly Button Ecosystem</title>
 
-    <!-- google fonts -->
-    <link href="https://fonts.googleapis.com/css?family=Just+Me+Again+Down+Here" rel="stylesheet">
-
     <!--Plotly-->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <!-- CSS -->
+    <!-- bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
         crossorigin="anonymous">
-    <link rel="stylesheet" href="../css/styles.css" crossorigin="anonymous">
+    <!-- CSS stylesheet -->
+    <link rel="stylesheet" href="/static/css/styles.css" >
 
     <!-- Optional theme -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
@@ -25,7 +23,7 @@
 </head>
 <body>
     <div class="container" style="text-align:center; margin-top:50px">
-        <div class="jumbotron" style="background:#D1D6E7;">
+        <div class="jumbotron" style="background: #d1d7d1;E7;">
             <h1>Belly Button Biodiversity Interactive Dashboard</h1>
             <p style="padding-top:10px;margin-bottom:0px">Based on this 
                 <a href="http://robdunnlab.com/projects/belly-button-biodiversity/" style="font-weight:bold;">study</a>
@@ -99,7 +97,7 @@
 
 </body>
 <footer>
-    <div class="fluid-container">
+    <div class="container">
         <div class='row'>
             <div class='col-md-2'>
                 <p class='text-align-left'>by Corey Clippinger</p>
@@ -112,17 +110,14 @@
     </div>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    
     <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" 
         crossorigin="anonymous"></script>
 
-    <!-- plotly.js cdn -->
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!--Internal JS script-->
+    <script src='/static/js/app.js' charset="utf-8"></script>
 
-    <script src="{{url_for('static',filename='js/app.js')}}"></script>
-
-    <!-- CSS stylesheet -->
-    <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
 
 </footer>
 </html>

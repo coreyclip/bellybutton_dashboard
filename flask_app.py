@@ -1,7 +1,7 @@
 
 # dependencies
 import os
-from flask import Flask, render_template, jsonify, request, redirect
+from flask import Flask, render_template, jsonify, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 
@@ -144,7 +144,11 @@ def get_wfreq(sample):
 
     Returns an integer value for the weekly washing frequency `WFREQ`
     """
-    result = db.session.query(samples_metadata.WFREQ).filter(samples_metadata.SAMPLEID == sample)
+    query = int(sample.strip("BB_"))
+    print(query, " data type: ", type(query))
+    result = db.session.query(
+            samples_metadata.WFREQ).\
+            filter(samples_metadata.SAMPLEID == query).all()
     print(result)
     return jsonify(result)
 
@@ -175,15 +179,17 @@ def get_samples(sample):
         }
     ]
     """
- 
-    otu_samples = []
-    samples = Base.classes.samples
+    df = pd.read_csv("DataSets/belly_button_biodiversity_samples.csv",
+                    index_col='otu_id', encoding="utf-8")
+    #print(df.info())
+    df['sample_values'] = df.sum(axis=1)
 
-    for row in session.query(samples).all():
-        otu_samples.append(row)
-    print(otu_samples)
+    from pprint import pprint
+    final_json = df['sample_values'].sort_values(ascending=False).to_json(orient='columns')
 
-    return jsonify(otu_samples)
+    pprint(final_json)
+
+    return jsonify(final_json)
 
 if __name__ == "__main__":
     app.run(debug=True)
