@@ -23,15 +23,19 @@ function initialize(){
     });
 
     // put the default values into the meta datatable
-    var url_meta = "/metadata/BB_940";
+    let url_meta = "/metadata/BB_940";
     Plotly.d3.json(url_meta, function (error, metadata) {
+        if (error) console.warn(error);
+        console.log("metadata", metadata[0]);
         Plotly.d3.select("tbody").selectAll("tr")
-            .data(metadata)
+            .data(metadata[0])
             .enter()
             .append("tr")
             .html(function (d) {
-                return `<td>${Object.keys(d)}</td><td>${d[Object.keys(d)]}</td>`
-            })
+                //console.log(Object.keys(d));
+                //console.log(d[Object.keys(d)]);
+                return `<td>${Object.keys(d)}</td><td>${Object.values(d)}</td>`
+            });
     });
 
     // initialize bubble chart
@@ -74,7 +78,8 @@ function DropDown() {
 
     let url = "/sampleNames"
 
-    let dropDownList = Plotly.d3.select("#selDataset").append('select')
+    let dropDownList = Plotly.d3.select("#selDataset")
+                                
 
     Plotly.d3.json(url, function(error, nameList){
         if (error) throw error;
@@ -86,7 +91,7 @@ function DropDown() {
             .text(function (d) { return d; });
     });
 
-}
+};
 // get data when dropdown selection changes
 
 function getDataTable(sample_id) {
@@ -107,4 +112,4 @@ function getDataTable(sample_id) {
 
 };
 
-
+initialize()

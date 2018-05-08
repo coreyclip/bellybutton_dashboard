@@ -102,7 +102,7 @@ def get_otu():
     """
 
     unit_names = [str(x).strip("(").rstrip(",)") for x in db.session.query(Otu.lowest_taxonomic_unit_found).all()]
-    print(unit_names)
+    #print(unit_names)
     return jsonify(unit_names)
 
 
@@ -180,14 +180,28 @@ def get_samples(sample):
     ]
     """
     df = pd.read_csv("DataSets/belly_button_biodiversity_samples.csv",
-                    index_col='otu_id', encoding="utf-8")
-    #print(df.info())
-    df['sample_values'] = df.sum(axis=1)
+                    index_col='otu_id', encoding="utf-8", dtype=None)
+    
+    
+    query = pd.to_numeric(df[str(sample)], downcast='float', errors='coerce')
 
-    from pprint import pprint
-    final_json = df['sample_values'].sort_values(ascending=False).to_json(orient='columns')
+    raw_values = query.sort_values(ascending=False)[:10].to_dict()
+    print(raw_values)
 
-    pprint(final_json)
+    #print(raw_values.keys())
+    #print(raw_values.values())
+
+    final_dict =  [
+        {
+            "otu_ids": [int(i) for i in list(raw_values.keys())],
+            "sample_values": [int(i) for i in list(raw_values.values())]
+        }
+    ]
+
+    import json 
+    final_json = json.dumps(final_dict)
+
+    
 
     return jsonify(final_json)
 
