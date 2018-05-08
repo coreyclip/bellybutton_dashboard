@@ -133,7 +133,7 @@ def get_sample_meta(sample):
                                samples_metadata.SAMPLEID
                                ).filter(samples_metadata.SAMPLEID == query).all()
     
-    print(result)
+    print(result[0])
     return jsonify(result)
 
 @app.route('/wfreq/<sample>')
@@ -193,8 +193,8 @@ def get_samples(sample):
 
     final_dict =  [
         {
-            "otu_ids": [int(i) for i in list(raw_values.keys())],
-            "sample_values": [int(i) for i in list(raw_values.values())]
+            "otu_ids": [int(i) for i in raw_values.keys()],
+            "sample_values": [int(i) for i in raw_values.values()]
         }
     ]
 

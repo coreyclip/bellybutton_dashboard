@@ -6,19 +6,21 @@ function initialize(){
     DropDown();
 
     // set default pie chart
-    let PieUrl = "/samples/BB_940";
+    let PieUrl = "/samples/BB_941";
 
     Plotly.d3.json(PieUrl, function(error, response){
         if (error) return console.warn(error);
+        //console.log(response)
+        
 
-        let data =[{
-            values: Object.values(data.sample_values),
-            labels: Object.values(data.otu_ids),
+        let trace =[{
+            values: response.sample_values,
+            labels: response.otu_ids,
             type: "pie"
         }]
 
 
-        Plotly.plot("piePlot", data)
+        Plotly.plot("piePlot", trace)
 
     });
 
@@ -26,15 +28,17 @@ function initialize(){
     let url_meta = "/metadata/BB_940";
     Plotly.d3.json(url_meta, function (error, metadata) {
         if (error) console.warn(error);
-        console.log("metadata", metadata[0]);
-        Plotly.d3.select("tbody").selectAll("tr")
-            .data(metadata[0])
+        
+        Plotly.d3.select("tbody")
+            .selectAll("tr")
+            .data(metadata)
             .enter()
             .append("tr")
-            .html(function (d) {
-                //console.log(Object.keys(d));
-                //console.log(d[Object.keys(d)]);
-                return `<td>${Object.keys(d)}</td><td>${Object.values(d)}</td>`
+            .html(function (obj) {for (key in obj){
+                console.log(key, obj[key])
+                return `<td>${key}</td><td>${obj[key]}</td>`
+            };
+                
             });
     });
 
@@ -44,17 +48,17 @@ function initialize(){
         if (error) return console.warn(error)
 
         let data = [{
-            x: Object.values(dataBubble.otu_ids),
-            y: Object.values(dataBubble.sample_values),
+            x: dataBubble.otu_id,
+            y: dataBubble.sample_values,
             mode: 'markers', 
             marker: {
-                size: Object.values(dataBubble.sample_values),
-                color: Object.values(dataBubble.otu_ids)
+                size: dataBubble.sample_values,
+                color: dataBubble.otu_ids
             }
         }];
 
         let layout = {
-            showlegend: True,
+            showlegend: true,
             xaxis:{
                 title: "OTU ID"
             },
@@ -113,3 +117,5 @@ function getDataTable(sample_id) {
 };
 
 initialize()
+
+
