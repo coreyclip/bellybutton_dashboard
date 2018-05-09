@@ -131,10 +131,22 @@ def get_sample_meta(sample):
                                samples_metadata.GENDER,
                                samples_metadata.LOCATION,
                                samples_metadata.SAMPLEID
-                               ).filter(samples_metadata.SAMPLEID == query).all()
+                               ).filter(samples_metadata.SAMPLEID == query).all()[0]
     
-    print(result[0])
-    return jsonify(result)
+    print(result)
+
+    final_json = {
+        "AGE": result[0],
+        "BBTYPE": result[1],
+        "ETHNICITY": result[2],
+        "GENDER": result[3],
+        "LOCATION": result[4],
+        "SAMPLEID": result[5],
+    }
+
+    print(final_json)
+    
+    return jsonify(final_json)
 
 @app.route('/wfreq/<sample>')
 def get_wfreq(sample):
