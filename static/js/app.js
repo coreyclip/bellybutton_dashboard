@@ -102,9 +102,10 @@ function render_wfreq(sample_id){
 
         let data = [
             {
-              x: [`sample: ${sample_id}`, 'The Sample Avg.'],
-              y: [wfreqData[0][0],2.8],
-              type: 'bar'
+              y: [`sample: ${sample_id}`, 'The Sample Avg.'],
+              x: [wfreqData[0][0],2.8],
+              type: 'bar',
+              orientation: "h",
             }
           ];
 
