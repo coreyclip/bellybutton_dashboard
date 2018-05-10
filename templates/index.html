@@ -39,19 +39,19 @@
     <div class="container">
         <div class="row">
             <!--sample selection-->
-            <div class="col-md-2">
+            <div class="col-md-3">
                 <h3><strong>Select sample:</strong></h3>
                 <select id="selDataset" onchange="optionChanged(this.value)"></select>
                 <div id="sampleList">
                 </div>
 
                 <div class="panel panel-default" style="margin-top:20px">
-                    <div class="panel-heading" style="background:#D1D6E7;text-align:center">
+                    <div class="panel-heading" style="background:#D1D6E7; text-align:center">
                         <h3 class="panel-title">Sample MetaData</h3>
                     </div>
                     <div class="panel-body">
                         <!--Sample Metadata Table-->
-                        <table class="table table-bordered">
+                        <table class="table table-bordered table-sm">
 
                             <tbody id="table">
                             </tbody>
@@ -78,9 +78,9 @@
                 </div>
             
             <!--the plot guage-->
-            <div class="col-md-4">
+            <div class="col-md-3">
                     <h3><strong>Washing Frequency vs biodiversity</strong></h3>
-                    <div id="guage"> plot guage</div>
+                    <div id="guage" class='bar'></div>
                 </div>
             </div>
         

@@ -210,12 +210,9 @@ def get_samples(sample):
         }
     ]
 
-    import json 
-    final_json = json.dumps(final_dict)
-
     
 
-    return jsonify(final_json)
+    return jsonify(final_dict)
 
 if __name__ == "__main__":
     app.run(debug=True)

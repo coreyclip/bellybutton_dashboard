@@ -20,12 +20,13 @@ function DropDown() {
 // get data when dropdown selection changes
 
 function getDataTable(sample_id) {
-    let meta_url = "/metadata/" + "BB_940";
+    let meta_url = "/metadata/" + sample_id;
     
     table = Plotly.d3.selectAll("tbody")
 
     Plotly.d3.json(meta_url, function (error, metaData) {
         if (error) console.warn(error);
+        table.selectAll('tr').remove();
         for (key in metaData){
             console.log(key, metaData[key])
             table.append('tr')
@@ -45,8 +46,8 @@ function PieChart(sample_id){
         
 
         let trace =[{
-            values: response.sample_values,
-            labels: response.otu_ids,
+            values: response[0].sample_values,
+            labels: response[0].otu_ids,
             hoverinfo: 'label+percent+name',
             hole: .3,
             type: "pie"
@@ -69,17 +70,17 @@ function bubblechart(sample_id){
     if (error) return console.warn(error)
 
     let data = [{
-        x: dataBubble.otu_id,
-        y: dataBubble.sample_values,
+        x: dataBubble[0].otu_id,
+        y: dataBubble[0].sample_values,
         mode: 'markers', 
         marker: {
-            size: dataBubble.sample_values,
-            color: dataBubble.otu_ids
+            size: dataBubble[0].sample_values,
+            color: dataBubble[0].otu_ids
         }
     }];
 
     let layout = {
-        showlegend: true,
+        showlegend: false,
         title:`Sample ID ${sample_id}`,
         xaxis:{
             title: "OTU ID"
@@ -94,6 +95,28 @@ function bubblechart(sample_id){
     Plotly.newPlot("bubble", data, layout)
 })};
 
+function render_wfreq(sample_id){
+    let wfreq_url = '/wfreq/' + sample_id;
+    Plotly.d3.json(wfreq_url, function(error, wfreqData){
+        if (error) console.warn(error);
+
+        let data = [
+            {
+              x: [`sample: ${sample_id}`, 'The Sample Avg.'],
+              y: [wfreqData[0][0],2.8],
+              type: 'bar'
+            }
+          ];
+
+          layout = {
+              title: "Washing Frequency per Week"
+          }
+        
+          Plotly.newPlot('guage', data);
+          
+    });
+};
+
 // on initial page load
 function initialize(){
 
@@ -107,10 +130,31 @@ function initialize(){
     PieChart("BB_940");
     
     // initialize bubble chart
-    bubblechart("BB_940")
+    bubblechart("BB_940");
 
+    // initialize bar chart
+    render_wfreq("BB_940");
 };
 
 initialize();
+
+function optionChanged(sample_id){
+    // create the dropdown menu
+    DropDown();
+
+    // load default MetaData table
+    getDataTable(sample_id);
+
+    // set default pie chart
+    PieChart(sample_id);
+    
+    // initialize bubble chart
+    bubblechart(sample_id);
+
+    // initialize bar chart
+    render_wfreq(sample_id);
+
+}
+
 
         
