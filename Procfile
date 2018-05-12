@@ -1,1 +1,1 @@
-web: gunicorn app:app --preload --workers 1
+web: gunicorn flask_app:app --preload --workers 1
