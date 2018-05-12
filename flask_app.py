@@ -1,5 +1,5 @@
 
-# dependencies
+#dependencies
 import os
 from flask import Flask, render_template, jsonify, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
@@ -191,39 +191,40 @@ def get_samples(sample):
         }
     ]
     """
-    df = pd.read_csv("DataSets/belly_button_biodiversity_samples.csv",
-                    index_col='otu_id', encoding="utf-8", dtype=None)
+    try: 
+        engine = create_engine("sqlite:///db/belly_button_biodiversity.sqlite")
+
+        # reflect an existing database into a new model
+        Base = automap_base()
+        # reflect the tables
+        Base.prepare(engine, reflect=True)
+
+        # Save reference to the table
+        measures = Base.classes.measures
+
+        # Create our session (link) from Python to the DB
+        session = Session(engine)
     
-    
-    query = pd.to_numeric(df[str(sample)], downcast='float', errors='coerce')
+    except:
+        df = pd.read_csv("belly_button_biodiversity_samples.csv", index_col = 'otu_id', encoding = "utf-8", dtype = None)
+        query = pd.to_numeric(df[str(sample)], downcast='float', errors='coerce')
 
-    raw_values = query.sort_values(ascending=False)[:10].to_dict()
-    print(raw_values)
+        raw_values = query.sort_values(ascending=False)[:10].to_dict()
+        print(raw_values)
 
-    #print(raw_values.keys())
-    #print(raw_values.values())
+        #print(raw_values.keys())
+        #print(raw_values.values())
 
-    final_dict =  [
-        {
-            "otu_ids": [int(i) for i in raw_values.keys()],
-            "sample_values": [int(i) for i in raw_values.values()]
-        }
-    ]
+        final_dict =  [
+            {
+                "otu_ids": [int(i) for i in raw_values.keys()],
+                "sample_values": [int(i) for i in raw_values.values()]
+            }
+        ]
 
-    
+
 
     return jsonify(final_dict)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
-
-
-
-
-
-    
-
-
-
-
-
+    app.run(debug=True)
