@@ -205,10 +205,14 @@ def get_samples(sample):
         Base.prepare(engine, reflect=True)
 
         # Save reference to the table
-        measures = Base.classes.samples
+        samples = Base.classes.samples
 
         # Create our session (link) from Python to the DB
         session = Session(engine)
+
+        results = session.query(samples.sample).all()
+
+        return jsonify(results)
     
     except:
         df = pd.read_csv("belly_button_biodiversity_samples.csv", index_col = 'otu_id', encoding = "utf-8", dtype = None)
@@ -228,8 +232,7 @@ def get_samples(sample):
         ]
 
 
-
-    return jsonify(final_dict)
+        return jsonify(final_dict)
 
 if __name__ == "__main__":
     app.run(debug=True)
