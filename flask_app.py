@@ -4,6 +4,11 @@ import os
 from flask import Flask, render_template, jsonify, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 
+import sqlalchemy
+from sqlalchemy.ext.automap import automap_base
+from sqlalchemy.orm import Session
+from sqlalchemy import create_engine, func
+
 
 import pandas as pd
 
@@ -200,7 +205,7 @@ def get_samples(sample):
         Base.prepare(engine, reflect=True)
 
         # Save reference to the table
-        measures = Base.classes.measures
+        measures = Base.classes.samples
 
         # Create our session (link) from Python to the DB
         session = Session(engine)
