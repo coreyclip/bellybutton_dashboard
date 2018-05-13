@@ -61,11 +61,11 @@ class samples_metadata(db.Model):
 
 
 # Create database tables
-@app.before_first_request
-def setup():
+#@app.before_first_request
+#def setup():
     # Recreate database each time for demo
     # db.drop_all()
-    db.create_all()
+    # db.create_all()
 
 @app.route("/data")
 def data():
