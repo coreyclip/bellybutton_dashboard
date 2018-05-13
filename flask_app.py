@@ -213,7 +213,7 @@ def get_samples(sample):
     
     except Exception:
 
-        print('Samples db failed to load using backup CSV' + Exception)
+        print('Samples db failed to load using backup CSV' + str(Exception))
         df = pd.read_csv("belly_button_biodiversity_samples.csv", index_col = 'otu_id', encoding = "utf-8", dtype = None)
         query = pd.to_numeric(df[str(sample)], downcast='float', errors='coerce')
 
