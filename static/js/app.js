@@ -99,22 +99,81 @@ function render_wfreq(sample_id){
     let wfreq_url = '/wfreq/' + sample_id;
     Plotly.d3.json(wfreq_url, function(error, wfreqData){
         if (error) console.warn(error);
-
-        let data = [
-            {
-              y: [`sample: ${sample_id}`, 'The Sample Avg.'],
-              x: [wfreqData[0][0],2.8],
-              type: 'bar',
-              orientation: "h",
-            }
-          ];
-
-          layout = {
-              title: "Washing Frequency per Week"
-          }
+        console.log(wfreqData[0]['WFREQ']);
+        let wfreq = wfreqData[0]['WFREQ']
+        const coef = 180 / 10;
+        let level = coef * wfreq;
         
-          Plotly.newPlot('guage', data);
-          
+        // Trig to calc meter point
+        let degrees = 180 - (level - 1);
+        let radius = .5;
+
+        let radians = degrees * Math.PI / 180;
+        let x = radius * Math.cos(radians);
+        let y = radius * Math.sin(radians);
+
+        let mainPath = 'M -.0 -0.035 L .0 0.035 L ',
+        pathX = String(x),
+        space = ' ',
+        pathY = String(y),
+        pathEnd = ' Z';
+ 
+
+        let path = mainPath.concat(pathX, space, pathY, pathEnd);
+
+        data = [{
+            type: 'scatter',
+            x: [0], y: [0],
+            marker: { size: 20, color: '#BF0803' },
+            showlegend: false,
+            name: 'Washing Frequency',
+            text: wfreq,
+            hoverinfo: 'text+name'
+        },
+        {
+            values: [5 / 5, 5 / 5, 5 / 5, 5 / 5, 5 / 5, 5],
+            rotation: 90,
+            text: ['8-10', '6-8', '4-6', '2-4', '0-2', ''],
+            textinfo: 'text',
+            textposition: 'inside',
+            marker: {
+                colors: ['#459373', '#6EAB92',
+                '#97C3B1', '#C1DBD0',
+                '#EAF3EF',
+                'rgb(255,255,255']
+            },
+            labels: ['8-10', '6-8', '4-6', '2-4', '0-2', ''],
+            hoverinfo: 'label',
+            hole: .5,
+            type: 'pie',
+            showlegend: false, 
+            //sort: false
+    }];
+
+    var layout = {
+        shapes: [{
+            type: 'path',
+            path: path,
+            fillcolor: '850000',
+            line: {
+                color: '850000',
+                weight: 1.5
+            }
+        }],
+
+        height: 500,
+        width: 400,
+        xaxis: {
+            zeroline: false, showticklabels: false,
+            showgrid: false, range: [-1, 1]
+        },
+        yaxis: {
+            zeroline: false, showticklabels: false,
+            showgrid: false, range: [-1, 1]
+        }
+    };
+
+    Plotly.newPlot('wfreq', data, layout);
     });
 };
 

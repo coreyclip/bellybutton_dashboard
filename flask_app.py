@@ -138,7 +138,6 @@ def get_sample_meta(sample):
                                samples_metadata.SAMPLEID
                                ).filter(samples_metadata.SAMPLEID == query).all()[0]
     
-    print(result)
 
     final_json = {
         "AGE": result[0],
@@ -149,8 +148,6 @@ def get_sample_meta(sample):
         "SAMPLEID": result[5],
     }
 
-    print(final_json)
-    
     return jsonify(final_json)
 
 @app.route('/wfreq/<sample>')
@@ -224,12 +221,10 @@ def get_samples(sample):
         #print(raw_values.keys())
         #print(raw_values.values())
 
-        final_dict =  [
-            {
+        final_dict =  [{
                 "otu_ids": [int(i) for i in raw_values.keys()],
                 "sample_values": [int(i) for i in raw_values.values()]
-            }
-        ]
+            }]
 
 
         return jsonify(final_dict)
