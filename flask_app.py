@@ -86,7 +86,7 @@ def get_sample_names():
 
     #retrieve the sample names
     sample_names = ["BB_" + str(x).strip("(").rstrip(",)") for x in db.session.query(samples_metadata.SAMPLEID).all()]
-    print(sample_names)
+    #print(sample_names)
     return jsonify(sample_names)
 
 
@@ -129,7 +129,7 @@ def get_sample_meta(sample):
     }
     """
     query = int(sample.strip("BB_"))
-    print(query, " data type: ", type(query))
+    #print(query, " data type: ", type(query))
     result = db.session.query(samples_metadata.AGE,
                                samples_metadata.BBTYPE,
                                samples_metadata.ETHNICITY,
@@ -159,11 +159,11 @@ def get_wfreq(sample):
     Returns an integer value for the weekly washing frequency `WFREQ`
     """
     query = int(sample.strip("BB_"))
-    print(query, " data type: ", type(query))
+    #print(query, " data type: ", type(query))
     result = db.session.query(
             samples_metadata.WFREQ).\
             filter(samples_metadata.SAMPLEID == query).all()
-    print(result)
+    print(f"washing frequency query result: {result}")
     return jsonify(result)
 
 @app.route('/samples/<sample>')
@@ -208,15 +208,17 @@ def get_samples(sample):
         session = Session(engine)
 
         results = session.query(samples.sample).all()
-
+        print(f"sample query result: {results}")
         return jsonify(results)
     
-    except:
+    except Exception:
+
+        print('Samples db failed to load using backup CSV' + Exception)
         df = pd.read_csv("belly_button_biodiversity_samples.csv", index_col = 'otu_id', encoding = "utf-8", dtype = None)
         query = pd.to_numeric(df[str(sample)], downcast='float', errors='coerce')
 
         raw_values = query.sort_values(ascending=False)[:10].to_dict()
-        print(raw_values)
+        #print(raw_values)
 
         #print(raw_values.keys())
         #print(raw_values.values())
