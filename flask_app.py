@@ -65,7 +65,7 @@ class samples_metadata(db.Model):
 def setup():
     # Recreate database each time for demo
     # db.drop_all()
-    # db.create_all()
+    db.create_all()
 
 @app.route("/data")
 def data():
