@@ -8,7 +8,7 @@ import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func
-
+import sqlite3
 
 import pandas as pd
 
@@ -193,7 +193,7 @@ def get_samples(sample):
         }
     ]
     """
-    try: 
+    try:
         engine = create_engine("sqlite:///db/belly_button_biodiversity.sqlite")
 
         # reflect an existing database into a new model
@@ -207,13 +207,13 @@ def get_samples(sample):
         # Create our session (link) from Python to the DB
         session = Session(engine)
 
-        results = session.query(samples.sample).all()
+        results = session.query(samples.otu_id, samples.c[sample]).all()
 
         return jsonify(results)
     
     except Exception as e:
         print(e)
-        df = pd.read_csv("DataSets/belly_button_biodiversity_samples.csv", index_col = 'otu_id', encoding = "utf-8")
+        df = pd.read_csv("DataSets/belly_button_biodiversity_samples.csv", index_col='otu_id', encoding = "utf-8")
         query = pd.to_numeric(df[str(sample)], downcast='float', errors='coerce')
 
         raw_values = query.sort_values(ascending=False)[:10].to_dict()
